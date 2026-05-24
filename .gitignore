@@ -1,0 +1,14 @@
+# Java/Maven
+target/
+*.class
+*.jar
+*.war
+
+# Angular/Node
+.angular/
+dist/
+node_modules/
+.vscode
+
+# IntelliJ IDEA
+.idea/

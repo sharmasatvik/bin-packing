@@ -1,0 +1,81 @@
+<div [class.saved]="isSaved" class="config-card">
+
+    <!-- Saved summary -->
+    <div *ngIf="isSaved" class="saved-view">
+        <div class="saved-grid">
+            <div class="dim-badge">
+                <span class="dim-label">L</span>
+                <span class="dim-val">{{ input.length }} {{ ms.dimUnit() }}</span>
+            </div>
+            <div class="dim-badge">
+                <span class="dim-label">W</span>
+                <span class="dim-val">{{ input.width }} {{ ms.dimUnit() }}</span>
+            </div>
+            <div class="dim-badge">
+                <span class="dim-label">H</span>
+                <span class="dim-val">{{ input.height }} {{ ms.dimUnit() }}</span>
+            </div>
+            <div class="dim-badge weight">
+                <span class="dim-label">Max Wt</span>
+                <span class="dim-val">{{ input.maxWeight }} {{ ms.weightUnit() }}</span>
+            </div>
+        </div>
+        <div class="volume-chip">
+            <svg fill="none" height="13" viewBox="0 0 13 13" width="13">
+                <path d="M1 4.5L6.5 1l5.5 3.5v4L6.5 12 1 8.5v-4z" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+            {{ displayVolume | number:'1.0-0' }} {{ ms.volUnit() }} volume
+        </div>
+        <button (click)="edit()" class="edit-btn">
+            <svg fill="none" height="13" viewBox="0 0 13 13" width="13">
+                <path d="M2 9.5L9 2.5l1.5 1.5-7 7H2V9.5z" stroke="currentColor" stroke-linejoin="round"
+                      stroke-width="1.3"/>
+            </svg>
+            Edit
+        </button>
+    </div>
+
+    <!-- Edit form -->
+    <div *ngIf="!isSaved" class="edit-form">
+        <div class="form-row">
+            <div class="field-group">
+                <label class="field-label">Length <span class="unit">({{ ms.dimUnit() }})</span></label>
+                <input (keyup.enter)="save()" [(ngModel)]="input.length" [class.error]="errors['length']"
+                       class="field-input" min="0.01" placeholder="0" type="number"/>
+                <span *ngIf="errors['length']" class="field-error">{{ errors['length'] }}</span>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Width <span class="unit">({{ ms.dimUnit() }})</span></label>
+                <input (keyup.enter)="save()" [(ngModel)]="input.width" [class.error]="errors['width']"
+                       class="field-input" min="0.01" placeholder="0" type="number"/>
+                <span *ngIf="errors['width']" class="field-error">{{ errors['width'] }}</span>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Height <span class="unit">({{ ms.dimUnit() }})</span></label>
+                <input (keyup.enter)="save()" [(ngModel)]="input.height" [class.error]="errors['height']"
+                       class="field-input" min="0.01" placeholder="0" type="number"/>
+                <span *ngIf="errors['height']" class="field-error">{{ errors['height'] }}</span>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Max Weight <span class="unit">({{ ms.weightUnit() }})</span></label>
+                <input (keyup.enter)="save()" [(ngModel)]="input.maxWeight" [class.error]="errors['maxWeight']"
+                       class="field-input" min="0.01" placeholder="0" step="0.1" type="number"/>
+                <span *ngIf="errors['maxWeight']" class="field-error">{{ errors['maxWeight'] }}</span>
+            </div>
+        </div>
+
+        <div class="form-footer">
+      <span *ngIf="displayVolume > 0" class="volume-preview">
+        Volume: {{ displayVolume | number:'1.0-0' }} {{ ms.volUnit() }}
+      </span>
+            <button (click)="save()" class="save-btn">
+                Confirm Box
+                <svg fill="none" height="14" viewBox="0 0 14 14" width="14">
+                    <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                          stroke-width="1.5"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+</div>

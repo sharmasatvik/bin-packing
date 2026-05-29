@@ -1,0 +1,244 @@
+<div class="app-shell">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg fill="none" height="20" viewBox="0 0 20 20" width="20">
+                        <rect
+                                height="11"
+                                rx="1.5"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                width="11"
+                                x="1"
+                                y="5"
+                        />
+                        <rect
+                                height="11"
+                                rx="1.5"
+                                stroke="currentColor"
+                                stroke-dasharray="2 2"
+                                stroke-width="1.5"
+                                width="11"
+                                x="8"
+                                y="2"
+                        />
+                        <path
+                                d="M5 10h3M6.5 8.5v3"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-width="1.5"
+                        />
+                    </svg>
+                </div>
+                <span class="brand-name">BinPack</span>
+                <span class="brand-tag">Optimizer</span>
+            </div>
+            <div class="header-steps">
+                <div
+                        [class.active]="activeStep >= 1"
+                        [class.done]="activeStep > 1"
+                        class="step-dot"
+                >
+                    <span>1</span>
+                </div>
+                <div [class.filled]="activeStep > 1" class="step-line"></div>
+                <div
+                        [class.active]="activeStep >= 2"
+                        [class.done]="activeStep > 2"
+                        class="step-dot"
+                >
+                    <span>2</span>
+                </div>
+                <div [class.filled]="activeStep > 2" class="step-line"></div>
+                <div [class.active]="activeStep >= 3" class="step-dot">
+                    <span>3</span>
+                </div>
+            </div>
+            <!-- Measurement toggle -->
+            <div class="unit-toggle">
+                <button
+                        (click)="measurement.system.set('metric')"
+                        [class.active]="measurement.isMetric()"
+                        class="unit-btn"
+                >
+                    cm / kg
+                </button>
+                <button
+                        (click)="measurement.system.set('imperial')"
+                        [class.active]="!measurement.isMetric()"
+                        class="unit-btn"
+                >
+                    in / lb
+                </button>
+            </div>
+
+            <button (click)="reset()" *ngIf="activeStep > 1" class="reset-btn">
+                <svg fill="none" height="14" viewBox="0 0 14 14" width="14">
+                    <path
+                            d="M2 7a5 5 0 1 0 1-3M2 2v3h3"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                    />
+                </svg>
+                Reset
+            </button>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main-content">
+        <!-- Main Title -->
+        <section class="main">
+            <h1 class="main-title">
+                Pack smarter.<br/>
+                <span class="main-accent">Ship less air.</span>
+            </h1>
+            <p class="main-sub">
+                Define your box, add SKUs, and get an optimal packing solution
+                instantly.
+            </p>
+        </section>
+
+        <!-- Step 1: Box Config -->
+        <section [class.section-done]="activeStep > 1" class="section">
+            <div class="section-label">
+        <span [class.done]="activeStep > 1" class="step-badge">
+          <svg
+                  *ngIf="activeStep > 1"
+                  fill="none"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  width="12"
+          >
+            <path
+                    d="M2 6l3 3 5-5"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.8"
+            />
+          </svg>
+          <span *ngIf="activeStep <= 1">01</span>
+        </span>
+                Box Configuration
+            </div>
+            <app-bin-config
+                    (configSaved)="onBoxConfigured($event)"
+                    [savedConfig]="boxConfig"
+            />
+        </section>
+
+        <!-- Step 2: SKU List -->
+        <section
+                *ngIf="activeStep >= 2"
+                [class.section-done]="activeStep > 2"
+                class="section"
+        >
+            <div class="section-label">
+        <span [class.done]="activeStep > 2" class="step-badge">
+          <svg
+                  *ngIf="activeStep > 2"
+                  fill="none"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  width="12"
+          >
+            <path
+                    d="M2 6l3 3 5-5"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.8"
+            />
+          </svg>
+          <span *ngIf="activeStep <= 2">02</span>
+        </span>
+                SKU Items
+            </div>
+            <app-sku-list (itemsChanged)="onSkusUpdated($event)"/>
+        </section>
+
+        <!-- Optimize CTA -->
+        <div *ngIf="activeStep >= 2 && !packingResult" class="optimize-bar">
+            <div *ngIf="skuItems.length > 0" class="sku-summary">
+                {{ skuItems.length }} SKU{{ skuItems.length !== 1 ? "s" : "" }} ready to
+                pack
+            </div>
+            <div *ngIf="skuItems.length === 0" class="sku-summary empty">
+                Add at least one SKU to proceed
+            </div>
+            <button
+                    (click)="onOptimize()"
+                    [disabled]="!canOptimize()"
+                    class="optimize-btn"
+            >
+        <span *ngIf="!isLoading">
+          <svg fill="none" height="16" viewBox="0 0 16 16" width="16">
+            <path
+                    d="M8 1v6l3-3M8 7l-3-3"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+            />
+            <path
+                    d="M1 10v3a1 1 0 001 1h12a1 1 0 001-1v-3"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="1.5"
+            />
+          </svg>
+          Optimize Packing
+        </span>
+                <span *ngIf="isLoading" class="loading-text">
+          <span class="spinner"></span>
+          Optimizing…
+        </span>
+            </button>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="error" class="error-banner">
+            <svg fill="none" height="16" viewBox="0 0 16 16" width="16">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path
+                        d="M8 5v3.5M8 11h.01"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-width="1.5"
+                />
+            </svg>
+            {{ error }}
+        </div>
+
+        <!-- Step 3: Results -->
+        <section *ngIf="packingResult" class="section results-section">
+            <div class="section-label">
+        <span class="step-badge done">
+          <svg fill="none" height="12" viewBox="0 0 12 12" width="12">
+            <path
+                    d="M2 6l3 3 5-5"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.8"
+            />
+          </svg>
+        </span>
+                Packing Result
+            </div>
+            <app-packing-result [boxConfig]="boxConfig!" [result]="packingResult"/>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <span>BinPack - 3D Bin Packing Optimizer</span>
+        <span class="footer-sep">·</span>
+        <span>First Fit Decreasing Algorithm</span>
+    </footer>
+</div>

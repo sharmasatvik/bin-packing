@@ -1,0 +1,104 @@
+<div class="sku-wrapper">
+
+    <!-- Item list -->
+    <div *ngIf="items.length > 0" class="item-list">
+        <div *ngFor="let item of items; let i = index" [style.animation-delay]="i * 40 + 'ms'"
+             class="item-row">
+            <div class="item-index">{{ i + 1 }}</div>
+            <div class="item-sku">{{ item.sku }}</div>
+            <div class="item-dims">
+                {{ itemDim(item.length) }} × {{ itemDim(item.width) }} × {{ itemDim(item.height) }} {{ ms.dimUnit() }}
+                <span class="dim-vol">{{ itemDisplayVolume(item) | number:'1.0-0' }} {{ ms.volUnit() }}</span>
+            </div>
+            <div class="item-weight">{{ itemWeight(item.weight) }} {{ ms.weightUnit() }}</div>
+            <div class="item-actions">
+                <button (click)="editItem(item)" class="icon-btn edit" title="Edit">
+                    <svg fill="none" height="13" viewBox="0 0 13 13" width="13">
+                        <path d="M2 9.5L9 2.5l1.5 1.5-7 7H2V9.5z" stroke="currentColor" stroke-linejoin="round"
+                              stroke-width="1.3"/>
+                    </svg>
+                </button>
+                <button (click)="removeItem(item.id)" class="icon-btn remove" title="Remove">
+                    <svg fill="none" height="13" viewBox="0 0 13 13" width="13">
+                        <path d="M2 2l9 9M11 2l-9 9" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="items.length === 0 && !showForm" class="empty-state">
+        <div class="empty-icon">
+            <svg fill="none" height="28" viewBox="0 0 28 28" width="28">
+                <rect height="17" rx="2" stroke="currentColor" stroke-width="1.5" width="17" x="2" y="8"/>
+                <rect height="17" rx="2" stroke="currentColor" stroke-dasharray="3 2" stroke-width="1.5" width="17" x="9"
+                      y="3"/>
+                <path d="M9 16.5h5M11.5 14v5" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"/>
+            </svg>
+        </div>
+        <p class="empty-text">No SKUs added yet</p>
+        <p class="empty-sub">Click the + button below to add your first item</p>
+    </div>
+
+    <!-- Add form -->
+    <div *ngIf="showForm" class="add-form">
+        <div class="form-title">{{ editingId ? 'Edit SKU' : 'New SKU' }}</div>
+        <div class="form-grid">
+            <div class="field-group span-full">
+                <label class="field-label">SKU Code</label>
+                <input (keyup.enter)="saveItem()" [(ngModel)]="newItem.sku" [class.error]="errors['sku']"
+                       autofocus class="field-input"
+                       placeholder="e.g. PROD-001" type="text"/>
+                <span *ngIf="errors['sku']" class="field-error">{{ errors['sku'] }}</span>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Length <span class="unit">({{ ms.dimUnit() }})</span></label>
+                <input (keyup.enter)="saveItem()" [(ngModel)]="newItem.length" [class.error]="errors['length']"
+                       class="field-input" min="0.01" placeholder="0" type="number"/>
+                <span *ngIf="errors['length']" class="field-error">{{ errors['length'] }}</span>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Width <span class="unit">({{ ms.dimUnit() }})</span></label>
+                <input (keyup.enter)="saveItem()" [(ngModel)]="newItem.width" [class.error]="errors['width']"
+                       class="field-input" min="0.01" placeholder="0" type="number"/>
+                <span *ngIf="errors['width']" class="field-error">{{ errors['width'] }}</span>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Height <span class="unit">({{ ms.dimUnit() }})</span></label>
+                <input (keyup.enter)="saveItem()" [(ngModel)]="newItem.height" [class.error]="errors['height']"
+                       class="field-input" min="0.01" placeholder="0" type="number"/>
+                <span *ngIf="errors['height']" class="field-error">{{ errors['height'] }}</span>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Weight <span class="unit">({{ ms.weightUnit() }})</span></label>
+                <input (keyup.enter)="saveItem()" [(ngModel)]="newItem.weight" [class.error]="errors['weight']"
+                       class="field-input" min="0.01" placeholder="0" step="0.01" type="number"/>
+                <span *ngIf="errors['weight']" class="field-error">{{ errors['weight'] }}</span>
+            </div>
+        </div>
+
+        <div class="form-footer">
+      <span *ngIf="displayVolume > 0" class="volume-hint">
+        Volume: {{ displayVolume | number:'1.0-0' }} {{ ms.volUnit() }}
+      </span>
+            <div class="form-actions">
+                <button (click)="cancelForm()" class="cancel-btn">Cancel</button>
+                <button (click)="saveItem()" class="confirm-btn">{{ editingId ? 'Update SKU' : 'Add SKU' }}</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add button -->
+    <button (click)="openForm()" *ngIf="!showForm" class="add-btn">
+        <svg fill="none" height="16" viewBox="0 0 16 16" width="16">
+            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/>
+        </svg>
+        Add SKU
+    </button>
+
+</div>
